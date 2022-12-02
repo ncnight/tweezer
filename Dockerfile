@@ -12,4 +12,5 @@ RUN git clone https://github.com/google/snappy.git && cd snappy && mkdir build &
 	-DCMAKE_INSTALL_PREFIX=/opt/scone/cross-compiler/x86_64-linux-musl .. && make install
 
 RUN git clone -b OpenSSL_1_1_1i https://github.com/openssl/openssl.git
+RUN apt install zlib1g-dev libbz2-dev liblz4-dev libzstd-dev curl -y
 RUN ./setup.sh

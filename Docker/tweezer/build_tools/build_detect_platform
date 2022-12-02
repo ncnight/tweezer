@@ -308,9 +308,9 @@ EOF
           int main() {}
 EOF
         if [ "$?" = 0 ]; then
-            COMMON_FLAGS="$COMMON_FLAGS -DSNAPPY"
-            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS -lsnappy"
-            JAVA_LDFLAGS="$JAVA_LDFLAGS -lsnappy"
+            COMMON_FLAGS="$COMMON_FLAGS"
+            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS"
+            JAVA_LDFLAGS="$JAVA_LDFLAGS"
         fi
     fi
 
@@ -357,9 +357,9 @@ EOF
           int main() {}
 EOF
         if [ "$?" = 0 ]; then
-            COMMON_FLAGS="$COMMON_FLAGS -DZLIB"
-            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS -lz"
-            JAVA_LDFLAGS="$JAVA_LDFLAGS -lz"
+            COMMON_FLAGS="$COMMON_FLAGS"
+            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS"
+            JAVA_LDFLAGS="$JAVA_LDFLAGS"
         fi
     fi
 
@@ -370,9 +370,9 @@ EOF
           int main() {}
 EOF
         if [ "$?" = 0 ]; then
-            COMMON_FLAGS="$COMMON_FLAGS -DBZIP2"
-            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS -lbz2"
-            JAVA_LDFLAGS="$JAVA_LDFLAGS -lbz2"
+            COMMON_FLAGS="$COMMON_FLAGS"
+            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS"
+            JAVA_LDFLAGS="$JAVA_LDFLAGS"
         fi
     fi
 
@@ -384,9 +384,9 @@ EOF
           int main() {}
 EOF
         if [ "$?" = 0 ]; then
-            COMMON_FLAGS="$COMMON_FLAGS -DLZ4"
-            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS -llz4"
-            JAVA_LDFLAGS="$JAVA_LDFLAGS -llz4"
+            COMMON_FLAGS="$COMMON_FLAGS"
+            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS"
+            JAVA_LDFLAGS="$JAVA_LDFLAGS"
         fi
     fi
 
@@ -397,9 +397,9 @@ EOF
           int main() {}
 EOF
         if [ "$?" = 0 ]; then
-            COMMON_FLAGS="$COMMON_FLAGS -DZSTD"
-            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS -lzstd"
-            JAVA_LDFLAGS="$JAVA_LDFLAGS -lzstd"
+            COMMON_FLAGS="$COMMON_FLAGS"
+            PLATFORM_LDFLAGS="$PLATFORM_LDFLAGS"
+            JAVA_LDFLAGS="$JAVA_LDFLAGS"
         fi
     fi
 
@@ -813,6 +813,8 @@ VALGRIND_VER="$VALGRIND_VER"
 ROCKSDB_MAJOR=`build_tools/version.sh major`
 ROCKSDB_MINOR=`build_tools/version.sh minor`
 ROCKSDB_PATCH=`build_tools/version.sh patch`
+
+JAVA_STATIC_LDFLAGS="$JAVA_STATIC_LDFLAGS -L/root/libs -lssl -lcrypto -ltcmalloc_minimal"
 
 echo "CC=$CC" >> "$OUTPUT"
 echo "CXX=$CXX" >> "$OUTPUT"

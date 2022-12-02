@@ -9,12 +9,12 @@
 CXXFLAGS+= -DBLOCK_ENC -DLOG_ENC -DMEMTABLE -DCACHE
 
 # Include path for openssl
-CXXFLAGS += -I../openssl/include
+CXXFLAGS += -I/usr/include/openssl/
 # Include path for rcmalloc
 CXXFLAGS += -I../gperftools/src
 
 # Setup library link directory
-LDFLAGS += -L../libs
+LDFLAGS += -L/root/libs
 # Link option for openssl
 LDFLAGS += -lssl -lcrypto
 # Link option for tcmalloc (untrusted allocator)
@@ -2155,17 +2155,10 @@ endif
 
 libsnappy.a:
 	-rm -rf snappy-$(SNAPPY_VER)
-ifeq (,$(wildcard ./snappy-$(SNAPPY_VER).tar.gz))
-	curl --fail --output snappy-$(SNAPPY_VER).tar.gz --location ${CURL_SSL_OPTS} ${SNAPPY_DOWNLOAD_BASE}/$(SNAPPY_VER).tar.gz
-endif
-	SNAPPY_SHA256_ACTUAL=`$(SHA256_CMD) snappy-$(SNAPPY_VER).tar.gz | cut -d ' ' -f 1`; \
-	if [ "$(SNAPPY_SHA256)" != "$$SNAPPY_SHA256_ACTUAL" ]; then \
-		echo snappy-$(SNAPPY_VER).tar.gz checksum mismatch, expected=\"$(SNAPPY_SHA256)\" actual=\"$$SNAPPY_SHA256_ACTUAL\"; \
-		exit 1; \
-	fi
-	tar xvzf snappy-$(SNAPPY_VER).tar.gz
+	git clone https://github.com/google/snappy.git && mv snappy snappy-$(SNAPPY_VER)
 	mkdir snappy-$(SNAPPY_VER)/build
-	cd snappy-$(SNAPPY_VER)/build && CFLAGS='${EXTRA_CFLAGS}' CXXFLAGS='${EXTRA_CXXFLAGS}' LDFLAGS='${EXTRA_LDFLAGS}' cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && $(MAKE) ${SNAPPY_MAKE_TARGET}
+	cd snappy-$(SNAPPY_VER) && git submodule update --init && cd ..
+	cd snappy-$(SNAPPY_VER)/build && CFLAGS='${EXTRA_CFLAGS} -fPIC' CXXFLAGS='${EXTRA_CXXFLAGS} -fPIC' LDFLAGS='${EXTRA_LDFLAGS}' cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && $(MAKE) ${SNAPPY_MAKE_TARGET}
 	cp snappy-$(SNAPPY_VER)/build/libsnappy.a .
 
 liblz4.a:
@@ -2198,11 +2191,11 @@ endif
 
 # A version of each $(LIB_OBJECTS) compiled with -fPIC and a fixed set of static compression libraries
 ifneq ($(ROCKSDB_JAVA_NO_COMPRESSION), 1)
-JAVA_COMPRESSIONS = libz.a libbz2.a libsnappy.a liblz4.a libzstd.a
+JAVA_COMPRESSIONS = libsnappy.a
 endif
 
-JAVA_STATIC_FLAGS = -DZLIB -DBZIP2 -DSNAPPY -DLZ4 -DZSTD
-JAVA_STATIC_INCLUDES = -I./zlib-$(ZLIB_VER) -I./bzip2-$(BZIP2_VER) -I./snappy-$(SNAPPY_VER) -I./lz4-$(LZ4_VER)/lib -I./zstd-$(ZSTD_VER)/lib/include
+JAVA_STATIC_FLAGS = -DSNAPPY
+JAVA_STATIC_INCLUDES = -I./snappy-$(SNAPPY_VER)
 ifneq ($(findstring rocksdbjavastatic, $(MAKECMDGOALS)),)
 CXXFLAGS += $(JAVA_STATIC_FLAGS) $(JAVA_STATIC_INCLUDES)
 CFLAGS +=  $(JAVA_STATIC_FLAGS) $(JAVA_STATIC_INCLUDES)
@@ -2210,7 +2203,7 @@ endif
 rocksdbjavastatic: $(LIB_OBJECTS) $(JAVA_COMPRESSIONS)
 	cd java;$(MAKE) javalib;
 	rm -f ./java/target/$(ROCKSDBJNILIB)
-	$(CXX) $(CXXFLAGS) -I./java/. $(JAVA_INCLUDE) -shared -fPIC \
+	$(CXX) $(CXXFLAGS) -I./java/. -I/usr/lib/jvm/java-11-openjdk-amd64/include $(JAVA_INCLUDE) -shared -fPIC \
 	  -o ./java/target/$(ROCKSDBJNILIB) $(JNI_NATIVE_SOURCES) \
 	  $(LIB_OBJECTS) $(COVERAGEFLAGS) \
 	  $(JAVA_COMPRESSIONS) $(JAVA_STATIC_LDFLAGS)

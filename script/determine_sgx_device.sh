@@ -1,6 +1,7 @@
-function determine_sgx_device {
+#!/bin/bash
+function determine_sgx_device() {
     export SGXDEVICE="/dev/sgx"
-    export MOUNT_SGXDEVICE="--device=/dev/sgx"
+    export MOUNT_SGXDEVICE="--device=/dev/sgx/enclave"
     if [[ ! -e "$SGXDEVICE" ]] ; then
         export SGXDEVICE="/dev/isgx"
         export MOUNT_SGXDEVICE="--device=/dev/isgx"
